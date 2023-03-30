@@ -16,19 +16,22 @@ export default class Ui {
    * @param {boolean} ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }) {
+    console.log(api,config);
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [ this.CSS.imageContainer ]),
+      imageContainer: make('div', [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
+      leftBtn: make('span', [ this.CSS.leftBtn ]),
+      rightBtn: make('span', [ this.CSS.rightBtn ]),
     };
 
     /**
@@ -66,7 +69,10 @@ export default class Ui {
       wrapper: 'image-tool',
       imageContainer: 'image-tool__image',
       imagePreloader: 'image-tool__image-preloader',
+      imageWrapper: 'image-tool__image-wrapper',
       imageEl: 'image-tool__image-picture',
+      leftBtn: 'image-toll__image-leftbtn',
+      rightBtn: 'image-toll__image-rightbtn',
       caption: 'image-tool__caption',
     };
   };
@@ -109,7 +115,7 @@ export default class Ui {
    * @returns {Element}
    */
   createFileButton() {
-    const button = make('div', [ this.CSS.button ]);
+    const button = make('div', [this.CSS.button]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
@@ -196,6 +202,15 @@ export default class Ui {
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
+    this.nodes.imageWrapper = make('span', this.CSS.imageWrapper);
+
+    console.log(this.config.direction)
+
+
+    if(this.config.direction){
+      this.nodes.imageWrapper.style.alignSelf = this.config.direction;
+    }
+
     /**
      * Add load event listener
      */
@@ -210,7 +225,13 @@ export default class Ui {
       }
     });
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+    this.nodes.imageWrapper.addEventListener('mouseenter', (event) => {
+      
+    });
+    this.nodes.imageWrapper.appendChild(this.nodes.imageEl);
+
+    this.nodes.imageContainer.appendChild(this.nodes.imageWrapper);
+
   }
 
   /**

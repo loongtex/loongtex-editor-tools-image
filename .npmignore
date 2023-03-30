@@ -5,3 +5,4 @@ src/
 .eslintrc
 webpack.config.js
 yarn.lock
+index.html

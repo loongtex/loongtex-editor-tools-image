@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-nested-checklist@latest"></script> -->
+    <script src="./dist/bundle.js"></script>
+    <!-- <link rel="stylesheet" href="./css/index.css"> -->
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* "prebuild": "npm version patch",
+    "postbuild": "npm publish", */
+
+        #editorjs {
+            /* margin-top: 400px; */
+            margin: 0 auto;
+            min-height: 100%;
+            padding: 30px 100px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        img{
+            width: 50px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editorjs"></div>
+    <script>
+        const editor = new EditorJS({
+            /** 
+             * Id of Element that should contain the Editor 
+             */
+            holder: 'editorjs',
+
+            /** 
+             * Available Tools list. 
+             * Pass Tool's class or Settings object for each Tool you want to use 
+             */
+            tools: {
+                image: {
+                    class: ImageTool,
+                    config: {
+                        uploader: {
+                            /**
+                             * Upload file to the server and return an uploaded image data
+                             * @param {File} file - file selected from the device or pasted by drag-n-drop
+                             * @return {Promise.<{success, file: {url}}>}
+                             */
+                            async uploadByFile(file) {
+                                const formData = new FormData();
+                                formData.append('picture', file)
+                                const response = await uploadImg(formData);
+                                if (response.code == 200) {
+                                    return {
+                                        success: 1,
+                                        file: {
+                                            url: 'https://app.loongtex.com/api/media/' + response.data.picture
+                                        }
+                                    }
+
+
+                                }
+                            },
+                        }
+
+                    }
+                },
+            },
+            data: {
+                "time": 1676279858980,
+                "blocks": [
+                    {
+                        "type": "image",
+                        "data": {
+                            "file": {
+                                "url": "https://app.loongtex.com/api/media/blog/2023/03/35d18c9c02daaf1c1c249616f4f27af1_o7YLvNa.jpg"
+                            },
+                            "caption": "Roadster // tesla.com",
+                            "withBorder": false,
+                            "withBackground": false,
+                            "stretched": true,
+                            "direction": 'center'
+                        }
+                    }
+
+                ],
+                "version": "2.26.0"
+            },
+            onChange: (api, event) => {
+                editor.save().then((output) => {
+                    console.log(output)
+                })
+            }
+        })
+        console.log(editor)
+
+        if (editor) {
+
+        }
+
+
+    </script>
+</body>
+
+</html>
