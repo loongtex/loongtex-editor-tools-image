@@ -137,6 +137,8 @@ export default class ImageTool {
     this.api = api;
     this.readOnly = readOnly;
 
+    console.log("config", config)
+
     /**
      * Tool's initial config
      */
@@ -150,7 +152,7 @@ export default class ImageTool {
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
-      direction: data.direction || 'center',
+      direction: data.direction || config.defaultDirection || 'center',
     };
 
     /**

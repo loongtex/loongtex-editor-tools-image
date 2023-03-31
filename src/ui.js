@@ -16,7 +16,7 @@ export default class Ui {
    * @param {boolean} ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }) {
-    console.log(api,config);
+    console.log(api, config);
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
@@ -30,8 +30,8 @@ export default class Ui {
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
-      leftBtn: make('span', [ this.CSS.leftBtn ]),
-      rightBtn: make('span', [ this.CSS.rightBtn ]),
+      leftBtn: make('span', [this.CSS.leftBtn]),
+      rightBtn: make('span', [this.CSS.rightBtn]),
     };
 
     /**
@@ -47,6 +47,19 @@ export default class Ui {
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
     this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
     this.nodes.wrapper.appendChild(this.nodes.imageContainer);
+
+    this.dragStart = {
+      x: 0,
+      y: 0,
+      isDragging: false,
+      direction: '',
+    };
+
+    this.imgSize = {
+      width: 0,
+      height: 0,
+      ratio: 0,
+    };
     // this.nodes.wrapper.appendChild(this.nodes.caption);
     // this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
@@ -71,8 +84,8 @@ export default class Ui {
       imagePreloader: 'image-tool__image-preloader',
       imageWrapper: 'image-tool__image-wrapper',
       imageEl: 'image-tool__image-picture',
-      leftBtn: 'image-toll__image-leftbtn',
-      rightBtn: 'image-toll__image-rightbtn',
+      leftBtn: 'image-tool__image-leftbtn',
+      rightBtn: 'image-tool__image-rightbtn',
       caption: 'image-tool__caption',
     };
   };
@@ -204,10 +217,7 @@ export default class Ui {
 
     this.nodes.imageWrapper = make('span', this.CSS.imageWrapper);
 
-    console.log(this.config.direction)
-
-
-    if(this.config.direction){
+    if (this.config.direction) {
       this.nodes.imageWrapper.style.alignSelf = this.config.direction;
     }
 
@@ -224,10 +234,52 @@ export default class Ui {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
+    const direction = this.config.direction;
 
     this.nodes.imageWrapper.addEventListener('mouseenter', (event) => {
-      
+      if (direction === 'center') {
+        this.nodes.imageWrapper.appendChild(this.nodes.leftBtn);
+        this.nodes.imageWrapper.appendChild(this.nodes.rightBtn);
+      };
+
+      if (direction === 'flex-start') {
+        this.nodes.imageWrapper.appendChild(this.nodes.rightBtn);
+      };
+
+      if (direction === 'flex-end') {
+        this.nodes.imageWrapper.appendChild(this.nodes.leftBtn);
+      };
+
+      event.target.style.backgroundColor = '#f5f5f5';
     });
+
+    this.nodes.imageWrapper.addEventListener('mouseleave', (event) => {
+      this.dragStart.direction === '' && this.nodes.imageWrapper.contains(this.nodes.leftBtn) && this.nodes.imageWrapper.removeChild(this.nodes.leftBtn);
+      this.dragStart.direction === '' && this.nodes.imageWrapper.contains(this.nodes.rightBtn) && this.nodes.imageWrapper.removeChild(this.nodes.rightBtn);
+      if (this.dragStart.direction === '') {
+        this.nodes.imageWrapper.style.backgroundColor = 'unset';
+      }
+    });
+
+    this.nodes.leftBtn.addEventListener('mousedown', (event) => {
+      this.dragStart.direction = 'left';
+      this.btnMouseDown(event);
+    });
+
+    this.nodes.rightBtn.addEventListener('mousedown', (event) => {
+      this.dragStart.direction = 'right';
+      this.btnMouseDown(event);
+    });
+
+    document.addEventListener('mousemove', (event) => {
+      this.move(event);
+    });
+
+    document.addEventListener('mouseup', (event) => {
+      this.dragStart.isDragging = false;
+      this.dragStart.direction = '';
+    });
+
     this.nodes.imageWrapper.appendChild(this.nodes.imageEl);
 
     this.nodes.imageContainer.appendChild(this.nodes.imageWrapper);
@@ -269,6 +321,59 @@ export default class Ui {
    */
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+  }
+
+  /**
+   *
+   * @param {*} event
+   */
+  btnMouseDown(event) {
+    this.dragStart.isDragging = true;
+    this.dragStart.x = event.clientX;
+    this.dragStart.y = event.clientY;
+
+    if (!this.imgSize.width) {
+      this.imgSize.width = this.nodes.imageEl.offsetWidth;
+    }
+
+    if (!this.imgSize.height) {
+      this.imgSize.height = this.nodes.imageEl.offsetHeight;
+    }
+
+    this.imgSize.ratio = this.imgSize.width / this.imgSize.height;
+  }
+
+  /**
+   *
+   * @param {*} event
+   */
+  move(event) {
+    if (this.dragStart.isDragging) {
+      let dx;
+
+      if (this.dragStart.direction === 'left') {
+        dx = this.dragStart.x - event.clientX;
+      }
+
+      if (this.dragStart.direction === 'right') {
+        dx = event.clientX - this.dragStart.x;
+      }
+
+      const newWidth = this.nodes.imageEl.offsetWidth + dx;
+
+      // 计算出比例
+
+      if (this.imgSize.width < newWidth) {
+
+        const newHeight = newWidth / this.imgSize.ratio;
+
+        this.nodes.imageEl.style.width = newWidth + 'px';
+        this.nodes.imageEl.style.height = newHeight + 'px';
+      }
+
+      this.dragStart.x = event.clientX;
+      this.dragStart.y = event.clientY;
+    }
   }
 }
 
