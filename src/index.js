@@ -141,6 +141,8 @@ export default class ImageTool {
     this.api = api;
     this.readOnly = readOnly;
 
+    console.log(data,'data')
+
     console.log("config", config);
 
     /**
@@ -157,6 +159,9 @@ export default class ImageTool {
       uploader: config.uploader || undefined,
       actions: config.actions || [],
       direction: data.direction || config.defaultDirection || 'center',
+      width: data.width || '100%',
+      height: data.height || '100%',
+      minWidth: config.minWidth,
     };
 
     /**
@@ -225,7 +230,10 @@ export default class ImageTool {
 
     this._data.caption = caption.innerHTML;
 
-    console.log(this.data, this._data);
+    this._data.width = this.ui.nodes.imageEl.width + 'px';
+    this._data.height = this.ui.nodes.imageEl.height + 'px';
+
+    console.log(this.data, this._data, this.ui.nodes.imageEl.width, this.ui.nodes.imageEl.height);
 
     return this.data;
   }

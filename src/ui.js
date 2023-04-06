@@ -215,6 +215,11 @@ export default class Ui {
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
+    console.log(this.config.width, this.config.height);
+
+    this.nodes.imageEl.style.width = this.config.width;
+    this.nodes.imageEl.style.height = this.config.height;
+
     this.nodes.imageWrapper = make('span', this.CSS.imageWrapper);
 
     if (this.config.direction) {
@@ -367,16 +372,21 @@ export default class Ui {
         dx = event.clientX - this.dragStart.x;
       }
 
-      const newWidth = this.nodes.imageEl.offsetWidth + dx;
+      console.log(dx)
+
+      const newWidth = this.imgSize.width + dx;
 
       // 计算出比例
 
-      if (this.imgSize.width < newWidth) {
+      if (this.config.minWidth <= newWidth) {
 
         const newHeight = newWidth / this.imgSize.ratio;
 
         this.nodes.imageEl.style.width = newWidth + 'px';
         this.nodes.imageEl.style.height = newHeight + 'px';
+
+        this.imgSize.width = newWidth;
+        this.imgSize.height = newHeight;
       }
 
       this.dragStart.x = event.clientX;
