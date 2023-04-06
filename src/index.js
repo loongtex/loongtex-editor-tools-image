@@ -46,7 +46,8 @@ import './index.css';
 import Ui from './ui';
 import Uploader from './uploader';
 
-import { IconAddBorder, IconStretch, IconAddBackground, IconPicture } from '@codexteam/icons';
+import { IconPicture, IconAlignCenter, IconAlignLeft, IconAlignRight } from '@codexteam/icons';
+import { make } from './utils/dom';
 
 /**
  * @typedef {object} ImageConfig
@@ -106,22 +107,25 @@ export default class ImageTool {
   static get tunes() {
     return [
       {
-        name: 'withBorder',
-        icon: IconAddBorder,
-        title: 'With border',
+        name: 'center',
+        icon: IconAlignCenter,
+        title: 'Align center',
         toggle: true,
+        isDisabled: false,
       },
       {
-        name: 'stretched',
-        icon: IconStretch,
-        title: 'Stretch image',
+        name: 'flex-start',
+        icon: IconAlignLeft,
+        title: 'Align left',
         toggle: true,
+        isDisabled: false,
       },
       {
-        name: 'withBackground',
-        icon: IconAddBackground,
-        title: 'With background',
+        name: 'flex-end',
+        icon: IconAlignRight,
+        title: 'Align right',
         toggle: true,
+        isDisabled: false,
       },
     ];
   }
@@ -137,7 +141,7 @@ export default class ImageTool {
     this.api = api;
     this.readOnly = readOnly;
 
-    console.log("config", config)
+    console.log("config", config);
 
     /**
      * Tool's initial config
@@ -221,6 +225,8 @@ export default class ImageTool {
 
     this._data.caption = caption.innerHTML;
 
+    console.log(this.data, this._data);
+
     return this.data;
   }
 
@@ -232,26 +238,80 @@ export default class ImageTool {
    * @returns {Array}
    */
   renderSettings() {
-    // Merge default tunes with the ones that might be added by user
-    // @see https://github.com/editor-js/image/pull/49
-    const tunes = ImageTool.tunes.concat(this.config.actions);
+    const tunes = ImageTool.tunes;
+    const that = this;
 
-    return tunes.map(tune => ({
-      icon: tune.icon,
-      label: this.api.i18n.t(tune.title),
-      name: tune.name,
-      toggle: tune.toggle,
-      isActive: this.data[tune.name],
-      onActivate: () => {
-        /* If it'a user defined tune, execute it's callback stored in action property */
-        if (typeof tune.action === 'function') {
-          tune.action(tune.name);
+    const wrapper = make('div', 'ce-popover__item'),
+      icon = make('div', 'ce-popover__item-icon'),
+      label = make('div', 'ce-popover__item-label'),
+      alignContainer = make('div', 'ce-popover__item-algin-container');
 
-          return;
+    icon.innerHTML = IconAlignCenter;
+    label.innerHTML = 'Alignment';
+
+    tunes.forEach(tune => {
+      const wrapperTune = make('div', 'ce-popover__item'),
+        iconTune = make('div', 'ce-popover__item-icon'),
+        labelTune = make('div', 'ce-popover__item-label');
+
+      if (this.data.direction === tune.name) {
+        wrapperTune.classList.add('ce-popover__item--active');
+      }
+
+      iconTune.innerHTML = tune.icon;
+      labelTune.textContent = tune.title;
+      wrapperTune.setAttribute('data-algin', tune.name);
+      wrapperTune.appendChild(iconTune);
+      wrapperTune.appendChild(labelTune);
+      alignContainer.appendChild(wrapperTune);
+    });
+
+    wrapper.addEventListener('mouseenter', () => {
+      alignContainer.style.opacity = '1';
+      alignContainer.style.pointerEvents = 'auto';
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      alignContainer.style.opacity = '0';
+      alignContainer.style.pointerEvents = 'none';
+    });
+
+    alignContainer.addEventListener('click', (event) => {
+      console.log(event);
+      console.log(alignContainer);
+      alignContainer.childNodes.forEach(children => {
+        const classList = children.classList;
+
+        if (classList.contains('ce-popover__item--active')) {
+          classList.remove('ce-popover__item--active');
         }
-        this.tuneToggled(tune.name);
-      },
-    }));
+      });
+      const text = event.target.textContent;
+
+      if (text.includes('center')) {
+        that.tuneToggleAll('center');
+        alignContainer.childNodes[0].classList.add('ce-popover__item--active');
+      }
+
+      if (text.includes('left')) {
+        console.log('left');
+        that.tuneToggleAll('flex-start');
+        alignContainer.childNodes[1].classList.add('ce-popover__item--active');
+      }
+
+      if (text.includes('right')) {
+        that.tuneToggleAll('flex-end');
+        alignContainer.childNodes[2].classList.add('ce-popover__item--active');
+      }
+      alignContainer.style.opacity = '0';
+      alignContainer.style.pointerEvents = 'none';
+    });
+
+    wrapper.appendChild(icon);
+    wrapper.appendChild(label);
+    wrapper.appendChild(alignContainer);
+
+    return wrapper;
   }
 
   /**
@@ -291,7 +351,7 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
@@ -350,16 +410,13 @@ export default class ImageTool {
    * @param {ImageToolData} data - data in Image Tool format
    */
   set data(data) {
+    console.log(data, 'data');
     this.image = data.file;
 
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    ImageTool.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
-
-      this.setTune(tune, value);
-    });
+    this.tuneToggleAll(data.direction);
   }
 
   /**
@@ -432,6 +489,15 @@ export default class ImageTool {
   tuneToggled(tuneName) {
     // inverse tune state
     this.setTune(tuneName, !this._data[tuneName]);
+  }
+
+  /**
+   *
+   */
+  tuneToggleAll(value) {
+    console.log(value);
+    this._data.direction = value;
+    this.ui.changeDirection(value);
   }
 
   /**

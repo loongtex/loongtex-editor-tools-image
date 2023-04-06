@@ -218,7 +218,7 @@ export default class Ui {
     this.nodes.imageWrapper = make('span', this.CSS.imageWrapper);
 
     if (this.config.direction) {
-      this.nodes.imageWrapper.style.alignSelf = this.config.direction;
+      this.changeDirection(this.config.direction);
     }
 
     /**
@@ -321,6 +321,14 @@ export default class Ui {
    */
   applyTune(tuneName, status) {
     this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+  }
+
+  /**
+   * 
+   * @param {*} value 
+   */
+  changeDirection(value) {
+    this.nodes.imageWrapper.style.alignSelf = value;
   }
 
   /**
