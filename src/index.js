@@ -140,11 +140,6 @@ export default class ImageTool {
   constructor({ data, config, api, readOnly }) {
     this.api = api;
     this.readOnly = readOnly;
-
-    console.log(data,'data')
-
-    console.log("config", config);
-
     /**
      * Tool's initial config
      */
@@ -250,17 +245,17 @@ export default class ImageTool {
     const that = this;
 
     const wrapper = make('div', 'ce-popover__item'),
-      icon = make('div', 'ce-popover__item-icon'),
-      label = make('div', 'ce-popover__item-label'),
-      alignContainer = make('div', 'ce-popover__item-algin-container');
+        icon = make('div', 'ce-popover__item-icon'),
+        label = make('div', 'ce-popover__item-label'),
+        alignContainer = make('div', 'ce-popover__item-algin-container');
 
     icon.innerHTML = IconAlignCenter;
     label.innerHTML = 'Alignment';
 
     tunes.forEach(tune => {
       const wrapperTune = make('div', 'ce-popover__item'),
-        iconTune = make('div', 'ce-popover__item-icon'),
-        labelTune = make('div', 'ce-popover__item-label');
+          iconTune = make('div', 'ce-popover__item-icon'),
+          labelTune = make('div', 'ce-popover__item-label');
 
       if (this.data.direction === tune.name) {
         wrapperTune.classList.add('ce-popover__item--active');
@@ -424,7 +419,7 @@ export default class ImageTool {
     this._data.caption = data.caption || '';
     this.ui.fillCaption(this._data.caption);
 
-    this.tuneToggleAll(data.direction);
+    // this.tuneToggleAll(data.direction);
   }
 
   /**
