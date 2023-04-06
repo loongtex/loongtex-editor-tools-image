@@ -237,9 +237,10 @@ export default class Ui {
         this.nodes.imagePreloader.style.backgroundImage = '';
       }
     });
-    const direction = this.config.direction;
 
     this.nodes.imageWrapper.addEventListener('mouseenter', (event) => {
+      const direction = this.config.direction;
+
       if (direction === 'center') {
         this.nodes.imageWrapper.appendChild(this.nodes.leftBtn);
         this.nodes.imageWrapper.appendChild(this.nodes.rightBtn);
@@ -331,6 +332,7 @@ export default class Ui {
    * @param {*} value 
    */
   changeDirection(value) {
+    this.config.direction = value;
     this.nodes.imageWrapper.style.alignSelf = value;
   }
 
