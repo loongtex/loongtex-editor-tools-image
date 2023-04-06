@@ -228,6 +228,8 @@ export default class ImageTool {
     this._data.width = this.ui.nodes.imageEl.width + 'px';
     this._data.height = this.ui.nodes.imageEl.height + 'px';
 
+    this._data.direction = this.ui.config.direction;
+
     console.log(this.data, this._data, this.ui.nodes.imageEl.width, this.ui.nodes.imageEl.height);
 
     return this.data;
