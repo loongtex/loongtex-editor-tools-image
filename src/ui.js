@@ -253,16 +253,11 @@ export default class Ui {
       if (direction === 'flex-end') {
         this.nodes.imageWrapper.appendChild(this.nodes.leftBtn);
       };
-
-      event.target.style.backgroundColor = '#f5f5f5';
     });
 
     this.nodes.imageWrapper.addEventListener('mouseleave', (event) => {
       this.dragStart.direction === '' && this.nodes.imageWrapper.contains(this.nodes.leftBtn) && this.nodes.imageWrapper.removeChild(this.nodes.leftBtn);
       this.dragStart.direction === '' && this.nodes.imageWrapper.contains(this.nodes.rightBtn) && this.nodes.imageWrapper.removeChild(this.nodes.rightBtn);
-      if (this.dragStart.direction === '') {
-        this.nodes.imageWrapper.style.backgroundColor = 'unset';
-      }
     });
 
     this.nodes.leftBtn.addEventListener('mousedown', (event) => {
