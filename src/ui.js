@@ -16,7 +16,6 @@ export default class Ui {
    * @param {boolean} ui.readOnly - read-only mode flag
    */
   constructor({ api, config, onSelectFile, readOnly }) {
-    console.log(api, config);
     this.api = api;
     this.config = config;
     this.onSelectFile = onSelectFile;
@@ -215,7 +214,6 @@ export default class Ui {
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
-    console.log(this.config.width, this.config.height);
 
     this.nodes.imageEl.style.width = this.config.width;
     this.nodes.imageEl.style.height = this.config.height;
@@ -372,16 +370,13 @@ export default class Ui {
         dx = event.clientX - this.dragStart.x;
       }
 
-      console.log(dx)
 
-      const newWidth = this.imgSize.width + dx;
+      const newWidth = this.nodes.imageEl.offsetWidth + dx;
+      const newHeight = newWidth / this.imgSize.ratio;
 
       // 计算出比例
 
-      if (this.config.minWidth <= newWidth) {
-
-        const newHeight = newWidth / this.imgSize.ratio;
-
+      if ((dx > 0 && this.imgSize.width < newWidth && this.imgSize.height < newHeight) || (this.config.minWidth <= newWidth && dx < 0)) {
         this.nodes.imageEl.style.width = newWidth + 'px';
         this.nodes.imageEl.style.height = newHeight + 'px';
 
