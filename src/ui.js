@@ -267,11 +267,15 @@ export default class Ui {
 
     this.nodes.leftBtn.addEventListener('mousedown', (event) => {
       this.dragStart.direction = 'left';
+      document.onselectstart = () => false;
+      document.ondragstart = () => false;
       this.btnMouseDown(event);
     });
 
     this.nodes.rightBtn.addEventListener('mousedown', (event) => {
       this.dragStart.direction = 'right';
+      document.onselectstart = () => false;
+      document.ondragstart = () => false;
       this.btnMouseDown(event);
     });
 
@@ -282,6 +286,10 @@ export default class Ui {
     document.addEventListener('mouseup', (event) => {
       this.dragStart.isDragging = false;
       this.dragStart.direction = '';
+      // 允许用户选择网页中文字
+      document.onselectstart = null;
+      // 允许用户拖动元素
+      document.ondragstart = null;
     });
 
     this.nodes.imageWrapper.appendChild(this.nodes.imageEl);
