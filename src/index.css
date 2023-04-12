@@ -11,7 +11,8 @@
     flex-direction: column;
 
     &-picture {
-      max-width: 100%;
+      width: 100%;
+      height: auto;
       vertical-align: bottom;
       display: inline-block;
       user-select: none;
@@ -47,6 +48,7 @@
     }
 
     &-wrapper {
+      max-width: 100%;
       display: inline-block;
       padding: 40px;
       border-radius: 4px;
@@ -55,6 +57,7 @@
       user-select: none;
       flex-shrink: 0;
       background-color: #fafafa;
+      box-sizing: border-box;
     }
 
     &-leftbtn {

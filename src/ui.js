@@ -22,15 +22,15 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [this.CSS.imageContainer]),
+      imageContainer: make('div', [ this.CSS.imageContainer ]),
       fileButton: this.createFileButton(),
       imageEl: undefined,
       imagePreloader: make('div', this.CSS.imagePreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
-      leftBtn: make('span', [this.CSS.leftBtn]),
-      rightBtn: make('span', [this.CSS.rightBtn]),
+      leftBtn: make('span', [ this.CSS.leftBtn ]),
+      rightBtn: make('span', [ this.CSS.rightBtn ]),
     };
 
     /**
@@ -58,6 +58,8 @@ export default class Ui {
       width: 0,
       height: 0,
       ratio: 0,
+      parentWidth: 0,
+      percentWidth: 0,
     };
     // this.nodes.wrapper.appendChild(this.nodes.caption);
     // this.nodes.wrapper.appendChild(this.nodes.fileButton);
@@ -127,7 +129,7 @@ export default class Ui {
    * @returns {Element}
    */
   createFileButton() {
-    const button = make('div', [this.CSS.button]);
+    const button = make('div', [ this.CSS.button ]);
 
     button.innerHTML = this.config.buttonContent || `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
 
@@ -214,11 +216,9 @@ export default class Ui {
      */
     this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
 
-
-    this.nodes.imageEl.style.width = this.config.width;
-    this.nodes.imageEl.style.height = this.config.height;
-
     this.nodes.imageWrapper = make('span', this.CSS.imageWrapper);
+
+    this.nodes.imageWrapper.style.width = this.config.width;
 
     if (this.config.direction) {
       this.changeDirection(this.config.direction);
@@ -290,7 +290,6 @@ export default class Ui {
     this.nodes.imageWrapper.appendChild(this.nodes.imageEl);
 
     this.nodes.imageContainer.appendChild(this.nodes.imageWrapper);
-
   }
 
   /**
@@ -331,8 +330,8 @@ export default class Ui {
   }
 
   /**
-   * 
-   * @param {*} value 
+   *
+   * @param {*} value
    */
   changeDirection(value) {
     this.config.direction = value;
@@ -349,14 +348,11 @@ export default class Ui {
     this.dragStart.y = event.clientY;
 
     if (!this.imgSize.width) {
-      this.imgSize.width = this.nodes.imageEl.offsetWidth;
+      this.imgSize.width = this.nodes.imageWrapper.clientWidth;
+      console.log(this.imgSize.width)
     }
 
-    if (!this.imgSize.height) {
-      this.imgSize.height = this.nodes.imageEl.offsetHeight;
-    }
-
-    this.imgSize.ratio = this.imgSize.width / this.imgSize.height;
+    this.imgSize.parentWidth = this.nodes.imageWrapper.parentNode.clientWidth;
   }
 
   /**
@@ -375,18 +371,18 @@ export default class Ui {
         dx = event.clientX - this.dragStart.x;
       }
 
+      const newWidth = this.imgSize.width + dx;
 
-      const newWidth = this.nodes.imageEl.offsetWidth + dx;
-      const newHeight = newWidth / this.imgSize.ratio;
+      // 如果新的宽度大于利父节点，则将宽度限制在一个像素内
+      if (newWidth > this.imgSize.parentWidth || newWidth < (this.config.minWidth + 80)) {
+        return;
+      }
 
-      // 计算出比例
+      const percentWidth = (newWidth / this.imgSize.parentWidth) * 100;
 
-      if ((dx > 0 && this.imgSize.width < newWidth && this.imgSize.height < newHeight) || (this.config.minWidth <= newWidth && dx < 0)) {
-        this.nodes.imageEl.style.width = newWidth + 'px';
-        this.nodes.imageEl.style.height = newHeight + 'px';
-
+      if ((dx > 0 && this.imgSize.width < newWidth) || (this.config.minWidth <= newWidth && dx < 0)) {
+        this.nodes.imageWrapper.style.width = percentWidth + '%';
         this.imgSize.width = newWidth;
-        this.imgSize.height = newHeight;
       }
 
       this.dragStart.x = event.clientX;
@@ -394,4 +390,3 @@ export default class Ui {
     }
   }
 }
-
